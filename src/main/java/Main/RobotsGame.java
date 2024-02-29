@@ -1,5 +1,9 @@
 package Main;
 
+import UIElems.PlayScreen;
+
+import java.beans.EventHandler;
+import java.time.LocalTime;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -7,17 +11,52 @@ public class RobotsGame {
     private World world;
     private Robot robot;
     private Scanner scanner;
+    public PlayScreen playArea;
 
     public RobotsGame(int width, int height) {
         this.world = new World(width, height);
         this.robot = new Robot("Robot1", "1", world, 0, 0);
         this.scanner = new Scanner(System.in);
+
+        this.playArea = new PlayScreen(world,robot,width,height);
     }
 
     // Method to display the game state in the terminal
     public void displayGameState() {
+        System.out.println("\n\n");
         world.displayWorld(robot);
         // Additional game state here if we need them
+    }
+
+    public void step(){
+        moveRobotRandomly();
+        playArea.draw();
+        displayGameState();
+    }
+
+    public void startGameLoopTimed() {
+        displayGameState();
+        double timePassed = 0;
+        double totalTimePassed = 0;
+        double prevTime = LocalTime.now().getSecond();
+        boolean continueGame = true;
+        while (continueGame) {
+            double newTime = LocalTime.now().getSecond();
+            timePassed += newTime - prevTime;
+            prevTime = newTime;
+            if(timePassed >= 5){
+                moveRobotRandomly();
+                playArea.draw();
+                displayGameState();
+                totalTimePassed += timePassed;
+                timePassed = 0;
+            }
+            if(totalTimePassed >= 30){
+                continueGame = false;
+            }
+            // game logic updates here
+
+        }
     }
 
     // Game loop
